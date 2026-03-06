@@ -1,5 +1,8 @@
 # TinyConfig
 
+[![NuGet](https://img.shields.io/nuget/v/TinyConfig.svg)](https://www.nuget.org/packages/TinyConfig)
+[![NuGet Downloads](https://img.shields.io/nuget/dt/TinyConfig.svg)](https://www.nuget.org/packages/TinyConfig)
+
 The simplest way to manage configuration in .NET. One unified interface for INI, JSON, XML, and Windows Registry.
 
 ## Install
