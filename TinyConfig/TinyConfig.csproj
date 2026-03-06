@@ -11,8 +11,8 @@
     <Description>The simplest way to manage INI, JSON, XML, and Registry settings for .NET.</Description>
     <PackageTags>config;ini;json;xml;registry;settings;configuration</PackageTags>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageProjectUrl>https://github.com/ldy/TinyConfig</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/ldy/TinyConfig</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/Bigide19/TinyConfig</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/Bigide19/TinyConfig</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
@@ -27,7 +27,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="..\..\README.md" Pack="true" PackagePath="\" />
+    <None Include="..\README.md" Pack="true" PackagePath="\" />
   </ItemGroup>
 
 </Project>
