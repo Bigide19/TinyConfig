@@ -1,0 +1,446 @@
+<Window
+    x:Class="TinyConfigSample.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Title="TinyConfig Sample"
+    Width="720"
+    Height="520"
+    MinWidth="620"
+    MinHeight="480"
+    ResizeMode="CanResize"
+    WindowStartupLocation="CenterScreen">
+
+    <TabControl Margin="8" SelectionChanged="Tab_Changed">
+
+        <!--  INI Tab  -->
+        <TabItem Header="INI">
+            <Grid Margin="12">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <StackPanel Grid.Row="0">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="70" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+
+                        <TextBlock
+                            Grid.Row="0"
+                            Grid.Column="0"
+                            Margin="0,0,0,6"
+                            VerticalAlignment="Center"
+                            Text="Section" />
+                        <TextBox
+                            x:Name="iniSection"
+                            Grid.Row="0"
+                            Grid.Column="1"
+                            Margin="0,0,0,6" />
+                        <TextBlock
+                            Grid.Row="1"
+                            Grid.Column="0"
+                            Margin="0,0,0,6"
+                            VerticalAlignment="Center"
+                            Text="Key" />
+                        <TextBox
+                            x:Name="iniKey"
+                            Grid.Row="1"
+                            Grid.Column="1"
+                            Margin="0,0,0,6" />
+                        <TextBlock
+                            Grid.Row="2"
+                            Grid.Column="0"
+                            VerticalAlignment="Center"
+                            Text="Value" />
+                        <TextBox
+                            x:Name="iniValue"
+                            Grid.Row="2"
+                            Grid.Column="1" />
+                    </Grid>
+
+                    <StackPanel Margin="0,10,0,10" Orientation="Horizontal">
+                        <Button
+                            Width="65"
+                            Margin="0,0,6,0"
+                            Click="IniGet_Click"
+                            Content="Get" />
+                        <Button
+                            Width="65"
+                            Margin="0,0,6,0"
+                            Click="IniSet_Click"
+                            Content="Set" />
+                        <Button
+                            Width="65"
+                            Margin="0,0,6,0"
+                            Click="IniExists_Click"
+                            Content="Exists" />
+                        <TextBlock
+                            x:Name="iniStatus"
+                            Margin="8,0,0,0"
+                            VerticalAlignment="Center"
+                            Foreground="Gray" />
+                    </StackPanel>
+                </StackPanel>
+
+                <DockPanel Grid.Row="1">
+                    <DockPanel Margin="0,0,0,4" DockPanel.Dock="Top">
+                        <TextBlock
+                            Margin="0,0,6,0"
+                            VerticalAlignment="Center"
+                            Text="Path:" />
+                        <Button
+                            Width="30"
+                            Margin="4,0,0,0"
+                            Click="IniBrowse_Click"
+                            Content="..."
+                            DockPanel.Dock="Right" />
+                        <TextBox x:Name="iniPath" TextChanged="IniPath_Changed" />
+                    </DockPanel>
+                    <GroupBox x:Name="iniPathHeader" Padding="4">
+                        <GroupBox.Header>
+                            <TextBlock
+                                x:Name="iniPathText"
+                                Text="settings.ini"
+                                TextTrimming="CharacterEllipsis"
+                                ToolTip="{Binding Text, RelativeSource={RelativeSource Self}}" />
+                        </GroupBox.Header>
+                        <TextBox
+                            x:Name="iniPreview"
+                            AcceptsReturn="True"
+                            FontFamily="Consolas"
+                            FontSize="12"
+                            IsReadOnly="True"
+                            TextWrapping="NoWrap"
+                            VerticalScrollBarVisibility="Auto" />
+                    </GroupBox>
+                </DockPanel>
+            </Grid>
+        </TabItem>
+
+        <!--  JSON Tab  -->
+        <TabItem Header="JSON">
+            <Grid Margin="12">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <StackPanel Grid.Row="0">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="70" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+
+                        <TextBlock
+                            Grid.Row="0"
+                            Grid.Column="0"
+                            Margin="0,0,0,6"
+                            VerticalAlignment="Center"
+                            Text="Object" />
+                        <TextBox
+                            x:Name="jsonSection"
+                            Grid.Row="0"
+                            Grid.Column="1"
+                            Margin="0,0,0,6" />
+                        <TextBlock
+                            Grid.Row="1"
+                            Grid.Column="0"
+                            Margin="0,0,0,6"
+                            VerticalAlignment="Center"
+                            Text="Key" />
+                        <TextBox
+                            x:Name="jsonKey"
+                            Grid.Row="1"
+                            Grid.Column="1"
+                            Margin="0,0,0,6" />
+                        <TextBlock
+                            Grid.Row="2"
+                            Grid.Column="0"
+                            VerticalAlignment="Center"
+                            Text="Value" />
+                        <TextBox
+                            x:Name="jsonValue"
+                            Grid.Row="2"
+                            Grid.Column="1" />
+                    </Grid>
+
+                    <StackPanel Margin="0,10,0,10" Orientation="Horizontal">
+                        <Button
+                            Width="65"
+                            Margin="0,0,6,0"
+                            Click="JsonGet_Click"
+                            Content="Get" />
+                        <Button
+                            Width="65"
+                            Margin="0,0,6,0"
+                            Click="JsonSet_Click"
+                            Content="Set" />
+                        <Button
+                            Width="65"
+                            Margin="0,0,6,0"
+                            Click="JsonExists_Click"
+                            Content="Exists" />
+                        <TextBlock
+                            x:Name="jsonStatus"
+                            Margin="8,0,0,0"
+                            VerticalAlignment="Center"
+                            Foreground="Gray" />
+                    </StackPanel>
+                </StackPanel>
+
+                <DockPanel Grid.Row="1">
+                    <DockPanel Margin="0,0,0,4" DockPanel.Dock="Top">
+                        <TextBlock
+                            Margin="0,0,6,0"
+                            VerticalAlignment="Center"
+                            Text="Path:" />
+                        <Button
+                            Width="30"
+                            Margin="4,0,0,0"
+                            Click="JsonBrowse_Click"
+                            Content="..."
+                            DockPanel.Dock="Right" />
+                        <TextBox x:Name="jsonPath" TextChanged="JsonPath_Changed" />
+                    </DockPanel>
+                    <GroupBox x:Name="jsonPathHeader" Padding="4">
+                        <GroupBox.Header>
+                            <TextBlock
+                                x:Name="jsonPathText"
+                                Text="settings.json"
+                                TextTrimming="CharacterEllipsis"
+                                ToolTip="{Binding Text, RelativeSource={RelativeSource Self}}" />
+                        </GroupBox.Header>
+                        <TextBox
+                            x:Name="jsonPreview"
+                            AcceptsReturn="True"
+                            FontFamily="Consolas"
+                            FontSize="12"
+                            IsReadOnly="True"
+                            TextWrapping="NoWrap"
+                            VerticalScrollBarVisibility="Auto" />
+                    </GroupBox>
+                </DockPanel>
+            </Grid>
+        </TabItem>
+
+        <!--  XML Tab  -->
+        <TabItem Header="XML">
+            <Grid Margin="12">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <StackPanel Grid.Row="0">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="70" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+
+                        <TextBlock
+                            Grid.Row="0"
+                            Grid.Column="0"
+                            Margin="0,0,0,6"
+                            VerticalAlignment="Center"
+                            Text="Element" />
+                        <TextBox
+                            x:Name="xmlSection"
+                            Grid.Row="0"
+                            Grid.Column="1"
+                            Margin="0,0,0,6" />
+                        <TextBlock
+                            Grid.Row="1"
+                            Grid.Column="0"
+                            Margin="0,0,0,6"
+                            VerticalAlignment="Center"
+                            Text="Key" />
+                        <TextBox
+                            x:Name="xmlKey"
+                            Grid.Row="1"
+                            Grid.Column="1"
+                            Margin="0,0,0,6" />
+                        <TextBlock
+                            Grid.Row="2"
+                            Grid.Column="0"
+                            VerticalAlignment="Center"
+                            Text="Value" />
+                        <TextBox
+                            x:Name="xmlValue"
+                            Grid.Row="2"
+                            Grid.Column="1" />
+                    </Grid>
+
+                    <StackPanel Margin="0,10,0,10" Orientation="Horizontal">
+                        <Button
+                            Width="65"
+                            Margin="0,0,6,0"
+                            Click="XmlGet_Click"
+                            Content="Get" />
+                        <Button
+                            Width="65"
+                            Margin="0,0,6,0"
+                            Click="XmlSet_Click"
+                            Content="Set" />
+                        <Button
+                            Width="65"
+                            Margin="0,0,6,0"
+                            Click="XmlExists_Click"
+                            Content="Exists" />
+                        <TextBlock
+                            x:Name="xmlStatus"
+                            Margin="8,0,0,0"
+                            VerticalAlignment="Center"
+                            Foreground="Gray" />
+                    </StackPanel>
+                </StackPanel>
+
+                <DockPanel Grid.Row="1">
+                    <DockPanel Margin="0,0,0,4" DockPanel.Dock="Top">
+                        <TextBlock
+                            Margin="0,0,6,0"
+                            VerticalAlignment="Center"
+                            Text="Path:" />
+                        <Button
+                            Width="30"
+                            Margin="4,0,0,0"
+                            Click="XmlBrowse_Click"
+                            Content="..."
+                            DockPanel.Dock="Right" />
+                        <TextBox x:Name="xmlPath" TextChanged="XmlPath_Changed" />
+                    </DockPanel>
+                    <GroupBox x:Name="xmlPathHeader" Padding="4">
+                        <GroupBox.Header>
+                            <TextBlock
+                                x:Name="xmlPathText"
+                                Text="settings.xml"
+                                TextTrimming="CharacterEllipsis"
+                                ToolTip="{Binding Text, RelativeSource={RelativeSource Self}}" />
+                        </GroupBox.Header>
+                        <TextBox
+                            x:Name="xmlPreview"
+                            AcceptsReturn="True"
+                            FontFamily="Consolas"
+                            FontSize="12"
+                            IsReadOnly="True"
+                            TextWrapping="NoWrap"
+                            VerticalScrollBarVisibility="Auto" />
+                    </GroupBox>
+                </DockPanel>
+            </Grid>
+        </TabItem>
+
+        <!--  Registry Tab  -->
+        <TabItem Header="Registry">
+            <Grid Margin="12">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <StackPanel Grid.Row="0">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="70" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+
+                        <TextBlock
+                            Grid.Row="0"
+                            Grid.Column="0"
+                            Margin="0,0,0,6"
+                            VerticalAlignment="Center"
+                            Text="SubKey" />
+                        <TextBox
+                            x:Name="regSection"
+                            Grid.Row="0"
+                            Grid.Column="1"
+                            Margin="0,0,0,6" />
+                        <TextBlock
+                            Grid.Row="1"
+                            Grid.Column="0"
+                            Margin="0,0,0,6"
+                            VerticalAlignment="Center"
+                            Text="Name" />
+                        <TextBox
+                            x:Name="regKey"
+                            Grid.Row="1"
+                            Grid.Column="1"
+                            Margin="0,0,0,6" />
+                        <TextBlock
+                            Grid.Row="2"
+                            Grid.Column="0"
+                            VerticalAlignment="Center"
+                            Text="Value" />
+                        <TextBox
+                            x:Name="regValue"
+                            Grid.Row="2"
+                            Grid.Column="1" />
+                    </Grid>
+
+                    <StackPanel Margin="0,10,0,10" Orientation="Horizontal">
+                        <Button
+                            Width="65"
+                            Margin="0,0,6,0"
+                            Click="RegGet_Click"
+                            Content="Get" />
+                        <Button
+                            Width="65"
+                            Margin="0,0,6,0"
+                            Click="RegSet_Click"
+                            Content="Set" />
+                        <Button
+                            Width="65"
+                            Margin="0,0,6,0"
+                            Click="RegExists_Click"
+                            Content="Exists" />
+                        <TextBlock
+                            x:Name="regStatus"
+                            Margin="8,0,0,0"
+                            VerticalAlignment="Center"
+                            Foreground="Gray" />
+                    </StackPanel>
+                </StackPanel>
+
+                <GroupBox
+                    Grid.Row="1"
+                    Padding="4"
+                    Header="HKCU\SOFTWARE\TinyConfigSample">
+                    <TextBox
+                        x:Name="regPreview"
+                        AcceptsReturn="True"
+                        FontFamily="Consolas"
+                        FontSize="12"
+                        IsReadOnly="True"
+                        Text="(Registry values — use Get to read)"
+                        TextWrapping="NoWrap"
+                        VerticalScrollBarVisibility="Auto" />
+                </GroupBox>
+            </Grid>
+        </TabItem>
+
+    </TabControl>
+</Window>

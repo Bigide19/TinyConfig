@@ -1,0 +1,27 @@
+name: PR Check
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Restore
+        run: dotnet restore TinyConfig/TinyConfig.csproj && dotnet restore TinyConfig.Tests/TinyConfig.Tests.csproj
+
+      - name: Build
+        run: dotnet build TinyConfig/TinyConfig.csproj -c Release --no-restore && dotnet build TinyConfig.Tests/TinyConfig.Tests.csproj -c Release --no-restore
+
+      - name: Test
+        run: dotnet test TinyConfig.Tests/TinyConfig.Tests.csproj -c Release --no-restore
