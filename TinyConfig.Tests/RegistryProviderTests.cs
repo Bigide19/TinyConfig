@@ -15,7 +15,7 @@ namespace TinyConfig.Tests
         [SetUp]
         public void SetUp()
         {
-            _config = TinyConfig.FromRegistry(TestSubKey);
+            _config = Config.FromRegistry(TestSubKey);
         }
 
         [TearDown]

@@ -39,7 +39,7 @@ namespace TinyConfigSample
         // === INI ===
 
         private ITinyConfig GetIni() =>
-            TinyConfig.TinyConfig.FromFile(_iniFilePath);
+            Config.FromFile(_iniFilePath);
 
         private void IniGet_Click(object sender, RoutedEventArgs e)
         {
@@ -74,7 +74,7 @@ namespace TinyConfigSample
         // === JSON ===
 
         private ITinyConfig GetJson() =>
-            TinyConfig.TinyConfig.FromJson(_jsonFilePath);
+            Config.FromJson(_jsonFilePath);
 
         private void JsonGet_Click(object sender, RoutedEventArgs e)
         {
@@ -109,7 +109,7 @@ namespace TinyConfigSample
         // === XML ===
 
         private ITinyConfig GetXml() =>
-            TinyConfig.TinyConfig.FromXml(_xmlFilePath);
+            Config.FromXml(_xmlFilePath);
 
         private void XmlGet_Click(object sender, RoutedEventArgs e)
         {
@@ -144,7 +144,7 @@ namespace TinyConfigSample
         // === Registry ===
 
         private ITinyConfig GetReg() =>
-            TinyConfig.TinyConfig.FromRegistry(RegistrySubKey);
+            Config.FromRegistry(RegistrySubKey);
 
         private void RegGet_Click(object sender, RoutedEventArgs e)
         {

@@ -16,7 +16,7 @@ namespace TinyConfig.Tests
         public void SetUp()
         {
             _tempFile = Path.Combine(Path.GetTempPath(), Guid.NewGuid() + ".xml");
-            _config = TinyConfig.FromXml(_tempFile);
+            _config = Config.FromXml(_tempFile);
         }
 
         [TearDown]
@@ -85,7 +85,7 @@ namespace TinyConfig.Tests
             _config.Set("DB", "Host", "10.0.0.1");
             _config.Set("DB", "Port", 3306);
 
-            var reloaded = TinyConfig.FromXml(_tempFile);
+            var reloaded = Config.FromXml(_tempFile);
 
             Assert.That(reloaded.Get("DB", "Host"), Is.EqualTo("10.0.0.1"));
             Assert.That(reloaded.Get<int>("DB", "Port", 0), Is.EqualTo(3306));
@@ -107,7 +107,7 @@ namespace TinyConfig.Tests
             string xml = "<?xml version=\"1.0\"?><Config><General><Language>ko</Language><Version>2</Version></General></Config>";
             File.WriteAllText(_tempFile, xml);
 
-            var config = TinyConfig.FromXml(_tempFile);
+            var config = Config.FromXml(_tempFile);
 
             Assert.That(config.Get("General", "Language"), Is.EqualTo("ko"));
             Assert.That(config.Get<int>("General", "Version", 0), Is.EqualTo(2));

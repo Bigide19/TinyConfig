@@ -15,7 +15,7 @@ namespace TinyConfig.Tests
         public void SetUp()
         {
             _tempFile = Path.Combine(Path.GetTempPath(), Guid.NewGuid() + ".json");
-            _config = TinyConfig.FromJson(_tempFile);
+            _config = Config.FromJson(_tempFile);
         }
 
         [TearDown]
@@ -84,7 +84,7 @@ namespace TinyConfig.Tests
             _config.Set("DB", "Host", "127.0.0.1");
             _config.Set("DB", "Port", 5432);
 
-            var reloaded = TinyConfig.FromJson(_tempFile);
+            var reloaded = Config.FromJson(_tempFile);
 
             Assert.That(reloaded.Get("DB", "Host"), Is.EqualTo("127.0.0.1"));
             Assert.That(reloaded.Get<int>("DB", "Port", 0), Is.EqualTo(5432));
@@ -106,7 +106,7 @@ namespace TinyConfig.Tests
             string json = "{ \"General\": { \"Language\": \"ko\", \"Version\": \"2\" } }";
             File.WriteAllText(_tempFile, json);
 
-            var config = TinyConfig.FromJson(_tempFile);
+            var config = Config.FromJson(_tempFile);
 
             Assert.That(config.Get("General", "Language"), Is.EqualTo("ko"));
             Assert.That(config.Get<int>("General", "Version", 0), Is.EqualTo(2));

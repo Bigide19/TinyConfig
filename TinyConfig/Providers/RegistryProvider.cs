@@ -36,13 +36,18 @@ namespace TinyConfig.Providers
         {
             string valStr = Get(section, key, null, false);
 
-            if (valStr == null)
+            if (string.IsNullOrWhiteSpace(valStr))
             {
                 if (autoSave) Set(section, key, defaultValue);
                 return defaultValue;
             }
 
             return ValueConverter.Convert(valStr, defaultValue);
+        }
+
+        public bool TryGet<T>(string section, string key, out T value)
+        {
+            return ValueConverter.TryConvert(Get(section, key, null, false), out value);
         }
 
         public void Set<T>(string section, string key, T value)

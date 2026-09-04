@@ -17,7 +17,7 @@ namespace TinyConfig.Tests
         {
             _tempFile = Path.GetTempFileName();
             File.Delete(_tempFile);
-            _config = TinyConfig.FromFile(_tempFile);
+            _config = Config.FromFile(_tempFile);
         }
 
         [TearDown]
@@ -101,7 +101,7 @@ namespace TinyConfig.Tests
             _config.Set("DB", "Host", "127.0.0.1");
             _config.Set("DB", "Port", 5432);
 
-            var reloaded = TinyConfig.FromFile(_tempFile);
+            var reloaded = Config.FromFile(_tempFile);
 
             Assert.That(reloaded.Get("DB", "Host"), Is.EqualTo("127.0.0.1"));
             Assert.That(reloaded.Get<int>("DB", "Port", 0), Is.EqualTo(5432));
@@ -132,7 +132,7 @@ namespace TinyConfig.Tests
             string content = "[General]\nLanguage=ko\nVersion=2\n";
             File.WriteAllText(_tempFile, content);
 
-            var config = TinyConfig.FromFile(_tempFile);
+            var config = Config.FromFile(_tempFile);
 
             Assert.That(config.Get("General", "Language"), Is.EqualTo("ko"));
             Assert.That(config.Get<int>("General", "Version", 0), Is.EqualTo(2));
@@ -144,7 +144,7 @@ namespace TinyConfig.Tests
             string content = "[App]\n; this is a comment\nMode=release\n";
             File.WriteAllText(_tempFile, content);
 
-            var config = TinyConfig.FromFile(_tempFile);
+            var config = Config.FromFile(_tempFile);
 
             Assert.That(config.Get("App", "Mode"), Is.EqualTo("release"));
             Assert.That(config.Exists("App", "; this is a comment"), Is.False);
