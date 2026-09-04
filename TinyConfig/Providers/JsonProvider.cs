@@ -1,3 +1,5 @@
+// Not built for .NET Framework: System.Text.Json is not part of the framework.
+#if !NETFRAMEWORK
 using TinyConfig.Internal;
 using System;
 using System.Collections.Generic;
@@ -113,3 +115,4 @@ namespace TinyConfig.Providers
         }
     }
 }
+#endif
