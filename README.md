@@ -20,11 +20,13 @@ dotnet add package TinyConfig
 ## Quick Start
 
 ```csharp
+using TinyConfig;
+
 // Pick any backend — the API is the same
-var config = TinyConfig.FromFile("settings.ini");   // INI
-var config = TinyConfig.FromJson("settings.json");  // JSON
-var config = TinyConfig.FromXml("settings.xml");    // XML
-var config = TinyConfig.FromRegistry(@"SOFTWARE\MyApp"); // Registry
+var config = Config.FromFile("settings.ini");   // INI
+var config = Config.FromJson("settings.json");  // JSON
+var config = Config.FromXml("settings.xml");    // XML
+var config = Config.FromRegistry(@"SOFTWARE\MyApp"); // Registry
 ```
 
 ## API
@@ -47,6 +49,12 @@ config.Set("Server", "Host", "192.168.0.1");
 
 // Check if a key exists
 bool exists = config.Exists("Server", "Host");
+
+// Try to read - false when the key is missing, empty, or the text does not fit T
+if (config.TryGet("Shutdown", "Everyday", out DateTime shutdown))
+{
+    // shutdown holds a converted value
+}
 ```
 
 ## Providers
@@ -54,7 +62,7 @@ bool exists = config.Exists("Server", "Host");
 ### INI
 
 ```csharp
-var config = TinyConfig.FromFile("settings.ini");
+var config = Config.FromFile("settings.ini");
 config.Set("Server", "Host", "localhost");
 ```
 
@@ -63,10 +71,25 @@ config.Set("Server", "Host", "localhost");
 Host=localhost
 ```
 
+Writing leaves the rest of the file alone. Comments, blank lines, key order and the
+spacing around `=` stay as they were, and only the line being changed is rewritten.
+A new key is added inside its section, above any trailing comment.
+
+INI files carry no encoding declaration. A file written by the Windows
+`WritePrivateProfileString` API is in the system ANSI code page, so pass the
+encoding explicitly instead of relying on the UTF-8 default:
+
+```csharp
+// .NET Core and later need the code page provider registered once
+Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+
+var config = Config.FromFile("cfg.ini", Encoding.GetEncoding(949));
+```
+
 ### JSON
 
 ```csharp
-var config = TinyConfig.FromJson("settings.json");
+var config = Config.FromJson("settings.json");
 config.Set("Database", "Port", 5432);
 ```
 
@@ -81,7 +104,7 @@ config.Set("Database", "Port", 5432);
 ### XML
 
 ```csharp
-var config = TinyConfig.FromXml("settings.xml");
+var config = Config.FromXml("settings.xml");
 config.Set("Logging", "Level", "Info");
 ```
 
@@ -98,10 +121,10 @@ config.Set("Logging", "Level", "Info");
 
 ```csharp
 // Default: HKEY_CURRENT_USER
-var config = TinyConfig.FromRegistry(@"SOFTWARE\MyApp");
+var config = Config.FromRegistry(@"SOFTWARE\MyApp");
 
 // Use a different root hive
-var config = TinyConfig.FromRegistry(@"SOFTWARE\MyApp", RegistryRoot.LocalMachine);
+var config = Config.FromRegistry(@"SOFTWARE\MyApp", RegistryRoot.LocalMachine);
 ```
 
 Available `RegistryRoot` values: `CurrentUser` (default), `LocalMachine`, `ClassesRoot`, `Users`, `CurrentConfig`
@@ -115,7 +138,9 @@ var timeout = config.Get<TimeSpan>("App", "Timeout", TimeSpan.FromSeconds(30));
 var mode = config.Get<MyEnum>("App", "Mode", MyEnum.Default);
 ```
 
-If conversion fails, the default value is returned safely.
+If conversion fails, `Get<T>` returns the default value. Use `TryGet<T>` when a format
+mismatch has to be told apart from a real default — a value stored as `210000` and read
+as `DateTime` returns false rather than silently falling back.
 
 ## Section Mapping
 

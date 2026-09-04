@@ -1,23 +1,28 @@
+using System;
+using System.Text;
+
 namespace TinyConfig
 {
     /// <summary>
-    /// Entry point for creating configuration providers.
+    /// Obsolete entry point. Shares its name with the namespace, so use <see cref="Config"/>.
     /// </summary>
+    [Obsolete("Use Config instead. This type shares its name with the namespace, so `using TinyConfig;` cannot resolve it.")]
     public static class TinyConfig
     {
-        /// <summary>Creates an INI file-based configuration provider.</summary>
-        public static ITinyConfig FromFile(string filePath) => new Providers.IniProvider(filePath);
+        /// <inheritdoc cref="Config.FromFile(string)"/>
+        public static ITinyConfig FromFile(string filePath) => Config.FromFile(filePath);
 
-        /// <summary>Creates a JSON file-based configuration provider.</summary>
-        public static ITinyConfig FromJson(string filePath) => new Providers.JsonProvider(filePath);
+        /// <inheritdoc cref="Config.FromFile(string, Encoding)"/>
+        public static ITinyConfig FromFile(string filePath, Encoding encoding) => Config.FromFile(filePath, encoding);
 
-        /// <summary>Creates an XML file-based configuration provider.</summary>
-        public static ITinyConfig FromXml(string filePath) => new Providers.XmlProvider(filePath);
+        /// <inheritdoc cref="Config.FromJson(string)"/>
+        public static ITinyConfig FromJson(string filePath) => Config.FromJson(filePath);
 
-        /// <summary>Creates a Windows Registry-based configuration provider.</summary>
-        /// <param name="subKey">Registry sub-key path (e.g. SOFTWARE\MyApp).</param>
-        /// <param name="root">Registry root hive. Defaults to HKEY_CURRENT_USER.</param>
+        /// <inheritdoc cref="Config.FromXml(string)"/>
+        public static ITinyConfig FromXml(string filePath) => Config.FromXml(filePath);
+
+        /// <inheritdoc cref="Config.FromRegistry(string, RegistryRoot)"/>
         public static ITinyConfig FromRegistry(string subKey, RegistryRoot root = RegistryRoot.CurrentUser)
-            => new Providers.RegistryProvider(subKey, root);
+            => Config.FromRegistry(subKey, root);
     }
 }
