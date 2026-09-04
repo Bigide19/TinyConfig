@@ -88,6 +88,8 @@ var config = Config.FromFile("cfg.ini", Encoding.GetEncoding(949));
 
 ### JSON
 
+Not available on the `net461` build.
+
 ```csharp
 var config = Config.FromJson("settings.json");
 config.Set("Database", "Port", 5432);
@@ -153,9 +155,19 @@ The first parameter (`section`) maps to different concepts depending on the prov
 | XML | Child element of `<Config>` |
 | Registry | Sub-key under root path |
 
-## Target Framework
+## Target Frameworks
 
-.NET Standard 2.0 — compatible with .NET Framework 4.6.1+, .NET Core 2.0+, and .NET 5 through 10+.
+`netstandard2.0` and `net461`.
+
+The `net461` build has no NuGet dependencies. Registry and XML are part of the
+framework there, so nothing is pulled in. `FromJson` is excluded from that build
+because `System.Text.Json` is not part of the framework and would add eight
+transitive packages.
+
+| Build | Providers | Dependencies |
+| --- | --- | --- |
+| `netstandard2.0` | INI, JSON, XML, Registry | `Microsoft.Win32.Registry`, `System.Text.Json` |
+| `net461` | INI, XML, Registry | none |
 
 ## License
 

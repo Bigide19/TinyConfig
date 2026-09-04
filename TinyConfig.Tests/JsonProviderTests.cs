@@ -1,3 +1,5 @@
+// The JSON provider ships for netstandard2.0 only.
+#if !NETFRAMEWORK
 using System;
 using System.IO;
 using NUnit.Framework;
@@ -122,3 +124,4 @@ namespace TinyConfig.Tests
         }
     }
 }
+#endif

@@ -1,12 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFrameworks>netstandard2.0;net461</TargetFrameworks>
     <LangVersion>7.3</LangVersion>
 
     <!-- NuGet Package -->
     <PackageId>TinyConfig</PackageId>
-    <Version>1.1.0</Version>
+    <Version>1.2.0</Version>
     <Authors>Bigide19</Authors>
     <Description>The simplest way to manage INI, JSON, XML, and Registry settings for .NET.</Description>
     <PackageTags>config;ini;json;xml;registry;settings;configuration</PackageTags>
@@ -21,7 +21,8 @@
     <InternalsVisibleTo Include="TinyConfig.Tests" />
   </ItemGroup>
 
-  <ItemGroup>
+  <!-- .NET Framework 는 Registry 와 Xml 이 내장입니다. JSON 은 아니라서 net4x 에서 제외합니다. -->
+  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
     <PackageReference Include="Microsoft.Win32.Registry" Version="5.0.0" />
     <PackageReference Include="System.Text.Json" Version="8.0.5" />
   </ItemGroup>
