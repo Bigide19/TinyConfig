@@ -4,10 +4,11 @@
     <!-- net461 is past end of support but kept for apps still targeting 4.6.1. -->
     <TargetFrameworks>netstandard2.0;net461;net462;net47;net471;net472;net48;net481;net8.0;net10.0</TargetFrameworks>
     <LangVersion>7.3</LangVersion>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
 
     <!-- NuGet Package -->
     <PackageId>TinyConfig</PackageId>
-    <Version>1.4.0</Version>
+    <Version>1.4.1</Version>
     <Authors>Bigide19</Authors>
     <Description>The simplest way to manage INI, JSON, XML, and Registry settings for .NET. No package dependencies on .NET Framework.</Description>
     <PackageTags>config;ini;json;xml;registry;settings;configuration</PackageTags>
@@ -16,10 +17,21 @@
     <RepositoryUrl>https://github.com/Bigide19/TinyConfig</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageReadmeFile>README.md</PackageReadmeFile>
+
+    <!-- Ship symbols and let debuggers fetch matching sources from GitHub. -->
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <DeterministicSourcePaths Condition="'$(ContinuousIntegrationBuild)' == 'true'">true</DeterministicSourcePaths>
   </PropertyGroup>
 
   <ItemGroup>
     <InternalsVisibleTo Include="TinyConfig.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
   </ItemGroup>
 
   <!-- Registry ships with .NET Framework and .NET 5+; only netstandard2.0 needs the package. -->

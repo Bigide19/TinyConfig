@@ -24,10 +24,13 @@ namespace TinyConfig.Providers
         private Dictionary<string, Dictionary<string, int>> _index =
             new Dictionary<string, Dictionary<string, int>>(StringComparer.OrdinalIgnoreCase);
 
+        /// <summary>Creates a provider over the given INI file, read as UTF-8 without BOM.</summary>
         public IniProvider(string filePath) : this(filePath, null)
         {
         }
 
+        /// <summary>Creates a provider over the given INI file with an explicit encoding.</summary>
+        /// <param name="filePath">Path to the INI file. It does not need to exist yet.</param>
         /// <param name="encoding">Encoding for reading and writing. Defaults to UTF-8 without BOM.</param>
         public IniProvider(string filePath, Encoding encoding)
         {
@@ -36,6 +39,7 @@ namespace TinyConfig.Providers
             Load();
         }
 
+        /// <inheritdoc/>
         public string Get(string section, string key, string defaultValue = "", bool autoSave = false)
         {
             int lineNo;
@@ -46,6 +50,7 @@ namespace TinyConfig.Providers
             return defaultValue;
         }
 
+        /// <inheritdoc/>
         public T Get<T>(string section, string key, T defaultValue = default(T), bool autoSave = false)
         {
             string valStr = Get(section, key, null, false);
@@ -59,6 +64,7 @@ namespace TinyConfig.Providers
             return ValueConverter.Convert(valStr, defaultValue);
         }
 
+        /// <inheritdoc/>
         public bool TryGet<T>(string section, string key, out T value)
         {
             value = default(T);
@@ -69,6 +75,7 @@ namespace TinyConfig.Providers
             return ValueConverter.TryConvert(ParseValue(_lines[lineNo]), out value);
         }
 
+        /// <inheritdoc/>
         public void Set<T>(string section, string key, T value)
         {
             string text = value == null ? "" : value.ToString();
@@ -87,6 +94,7 @@ namespace TinyConfig.Providers
             Save();
         }
 
+        /// <inheritdoc/>
         public bool Exists(string section, string key)
         {
             int lineNo;
