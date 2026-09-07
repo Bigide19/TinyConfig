@@ -1,10 +1,8 @@
-// Not built for .NET Framework: System.Text.Json is not part of the framework.
-#if !NETFRAMEWORK
 using TinyConfig.Internal;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text.Json;
+using System.Text;
 
 namespace TinyConfig.Providers
 {
@@ -67,22 +65,8 @@ namespace TinyConfig.Providers
         private void Save()
         {
             EnsureDirectory();
-            var options = new JsonWriterOptions { Indented = true };
-            using (var stream = File.Create(_filePath))
-            using (var writer = new Utf8JsonWriter(stream, options))
-            {
-                writer.WriteStartObject();
-                foreach (var section in _data)
-                {
-                    writer.WriteStartObject(section.Key);
-                    foreach (var kvp in section.Value)
-                    {
-                        writer.WriteString(kvp.Key, kvp.Value);
-                    }
-                    writer.WriteEndObject();
-                }
-                writer.WriteEndObject();
-            }
+            // UTF-8 without BOM, matching what the previous Utf8JsonWriter emitted.
+            File.WriteAllText(_filePath, MiniJson.Write(_data), new UTF8Encoding(false));
         }
 
         private void EnsureDirectory()
@@ -96,23 +80,7 @@ namespace TinyConfig.Providers
         {
             if (!File.Exists(_filePath)) return;
 
-            var bytes = File.ReadAllBytes(_filePath);
-            var doc = JsonDocument.Parse(bytes);
-
-            foreach (var section in doc.RootElement.EnumerateObject())
-            {
-                if (section.Value.ValueKind != JsonValueKind.Object) continue;
-
-                var dict = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-                foreach (var prop in section.Value.EnumerateObject())
-                {
-                    dict[prop.Name] = prop.Value.ToString();
-                }
-                _data[section.Name] = dict;
-            }
-
-            doc.Dispose();
+            _data = MiniJson.Parse(File.ReadAllText(_filePath));
         }
     }
 }
-#endif

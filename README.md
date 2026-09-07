@@ -3,7 +3,8 @@
 [![NuGet](https://img.shields.io/nuget/v/TinyConfig.svg)](https://www.nuget.org/packages/TinyConfig)
 [![NuGet Downloads](https://img.shields.io/nuget/dt/TinyConfig.svg)](https://www.nuget.org/packages/TinyConfig)
 
-The simplest way to manage configuration in .NET. One unified interface for INI, JSON, XML, and Windows Registry.
+The simplest way to manage configuration in .NET. One unified interface for INI,
+JSON, XML, and Windows Registry, with no package dependencies on .NET Framework.
 
 ## Install
 
@@ -88,8 +89,6 @@ var config = Config.FromFile("cfg.ini", Encoding.GetEncoding(949));
 
 ### JSON
 
-Not available on the `net461` build.
-
 ```csharp
 var config = Config.FromJson("settings.json");
 config.Set("Database", "Port", 5432);
@@ -102,6 +101,12 @@ config.Set("Database", "Port", 5432);
   }
 }
 ```
+
+Values are always written as JSON strings, and a hand-edited file may use numbers,
+booleans or `null` instead - those read back fine. JSON parsing is built in rather
+than taken from `System.Text.Json`, so the package stays dependency-free and works
+on .NET Framework. Writing escapes only what the JSON grammar requires, which
+leaves non-ASCII text readable as UTF-8.
 
 ### XML
 
@@ -159,15 +164,15 @@ The first parameter (`section`) maps to different concepts depending on the prov
 
 `netstandard2.0` and `net461`.
 
-The `net461` build has no NuGet dependencies. Registry and XML are part of the
-framework there, so nothing is pulled in. `FromJson` is excluded from that build
-because `System.Text.Json` is not part of the framework and would add eight
-transitive packages.
+All four providers work on both builds. The `net461` build has no NuGet
+dependencies at all: Registry and XML are part of the framework there, and JSON
+uses the built-in parser rather than `System.Text.Json`, which supports net462
+and later only.
 
 | Build | Providers | Dependencies |
 | --- | --- | --- |
-| `netstandard2.0` | INI, JSON, XML, Registry | `Microsoft.Win32.Registry`, `System.Text.Json` |
-| `net461` | INI, XML, Registry | none |
+| `netstandard2.0` | INI, JSON, XML, Registry | `Microsoft.Win32.Registry` |
+| `net461` | INI, JSON, XML, Registry | none |
 
 ## License
 
