@@ -11,6 +11,7 @@ namespace TinyConfig
         public static ITinyConfig FromFile(string filePath) => new Providers.IniProvider(filePath);
 
         /// <summary>Creates an INI file provider with an explicit encoding.</summary>
+        /// <param name="filePath">Path to the INI file. It does not need to exist yet.</param>
         /// <param name="encoding">
         /// On .NET Core and later, code pages such as 949 require
         /// Encoding.RegisterProvider(CodePagesEncodingProvider.Instance).

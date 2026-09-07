@@ -15,12 +15,14 @@ namespace TinyConfig.Providers
         private readonly string _filePath;
         private Dictionary<string, Dictionary<string, string>> _data = new Dictionary<string, Dictionary<string, string>>(StringComparer.OrdinalIgnoreCase);
 
+        /// <summary>Creates a provider over the given JSON file.</summary>
         public JsonProvider(string filePath)
         {
             _filePath = filePath;
             Load();
         }
 
+        /// <inheritdoc/>
         public string Get(string section, string key, string defaultValue = "", bool autoSave = false)
         {
             if (_data.TryGetValue(section, out var sectionDict) && sectionDict.TryGetValue(key, out var val))
@@ -30,6 +32,7 @@ namespace TinyConfig.Providers
             return defaultValue;
         }
 
+        /// <inheritdoc/>
         public T Get<T>(string section, string key, T defaultValue = default(T), bool autoSave = false)
         {
             string valStr = Get(section, key, null, false);
@@ -43,11 +46,13 @@ namespace TinyConfig.Providers
             return ValueConverter.Convert(valStr, defaultValue);
         }
 
+        /// <inheritdoc/>
         public bool TryGet<T>(string section, string key, out T value)
         {
             return ValueConverter.TryConvert(Get(section, key, null, false), out value);
         }
 
+        /// <inheritdoc/>
         public void Set<T>(string section, string key, T value)
         {
             if (!_data.ContainsKey(section))
@@ -57,6 +62,7 @@ namespace TinyConfig.Providers
             Save();
         }
 
+        /// <inheritdoc/>
         public bool Exists(string section, string key)
         {
             return _data.TryGetValue(section, out var sectionDict) && sectionDict.ContainsKey(key);

@@ -33,6 +33,7 @@ namespace TinyConfig.Providers
             _hive = GetHive(root);
         }
 
+        /// <inheritdoc/>
         public string Get(string section, string key, string defaultValue = "", bool autoSave = false)
         {
             string subKey = BuildSubKey(section);
@@ -50,6 +51,7 @@ namespace TinyConfig.Providers
             return defaultValue;
         }
 
+        /// <inheritdoc/>
         public T Get<T>(string section, string key, T defaultValue = default(T), bool autoSave = false)
         {
             string valStr = Get(section, key, null, false);
@@ -63,11 +65,13 @@ namespace TinyConfig.Providers
             return ValueConverter.Convert(valStr, defaultValue);
         }
 
+        /// <inheritdoc/>
         public bool TryGet<T>(string section, string key, out T value)
         {
             return ValueConverter.TryConvert(Get(section, key, null, false), out value);
         }
 
+        /// <inheritdoc/>
         public void Set<T>(string section, string key, T value)
         {
             string subKey = BuildSubKey(section);
@@ -80,6 +84,7 @@ namespace TinyConfig.Providers
             }
         }
 
+        /// <inheritdoc/>
         public bool Exists(string section, string key)
         {
             string subKey = BuildSubKey(section);

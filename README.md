@@ -6,6 +6,17 @@
 The simplest way to manage configuration in .NET. One unified interface for INI,
 JSON, XML, and Windows Registry, with no package dependencies on .NET Framework.
 
+## At a glance
+
+| | |
+| --- | --- |
+| Entry point | `Config.FromFile`, `Config.FromJson`, `Config.FromXml`, `Config.FromRegistry` |
+| Interface | `ITinyConfig`: `Get`, `Get<T>`, `TryGet<T>`, `Set<T>`, `Exists` |
+| Backends | INI, JSON, XML, Windows Registry |
+| Targets | net461 through net481, net8.0, net10.0, netstandard2.0 |
+| Dependencies | none on .NET Framework and .NET |
+| Lookup | section and key are case-insensitive |
+
 ## Install
 
 ```
@@ -23,7 +34,7 @@ dotnet add package TinyConfig
 ```csharp
 using TinyConfig;
 
-// Pick any backend — the API is the same
+// Pick any backend - the API is the same
 var config = Config.FromFile("settings.ini");   // INI
 var config = Config.FromJson("settings.json");  // JSON
 var config = Config.FromXml("settings.xml");    // XML
@@ -150,7 +161,7 @@ var mode = config.Get<MyEnum>("App", "Mode", MyEnum.Default);
 ```
 
 If conversion fails, `Get<T>` returns the default value. Use `TryGet<T>` when a format
-mismatch has to be told apart from a real default — a value stored as `210000` and read
+mismatch has to be told apart from a real default - a value stored as `210000` and read
 as `DateTime` returns false rather than silently falling back.
 
 ## Section Mapping

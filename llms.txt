@@ -1,0 +1,110 @@
+# TinyConfig
+
+> A .NET library that reads and writes configuration through one interface,
+> `ITinyConfig`, over four backends: INI files, JSON files, XML files, and the
+> Windows Registry. Adding the package pulls in no other packages on .NET
+> Framework or .NET.
+
+NuGet: `TinyConfig` - https://www.nuget.org/packages/TinyConfig
+Source: https://github.com/Bigide19/TinyConfig
+License: MIT
+
+## Getting a provider
+
+Every backend is created from the static `Config` class and returns `ITinyConfig`,
+so the calling code is identical whichever one you pick.
+
+```csharp
+using TinyConfig;
+
+ITinyConfig config = Config.FromFile("settings.ini");            // INI
+ITinyConfig config = Config.FromFile("cfg.ini", Encoding.GetEncoding(949));
+ITinyConfig config = Config.FromJson("settings.json");           // JSON
+ITinyConfig config = Config.FromXml("settings.xml");             // XML
+ITinyConfig config = Config.FromRegistry(@"SOFTWARE\MyApp");     // Registry, HKCU
+ITinyConfig config = Config.FromRegistry(@"SOFTWARE\MyApp", RegistryRoot.LocalMachine);
+```
+
+`Config` is the current entry point. A type named `TinyConfig` also exists but is
+`[Obsolete]`, because it collides with the namespace and cannot be resolved through
+`using TinyConfig;`.
+
+## Reading and writing
+
+```csharp
+string host = config.Get("Server", "Host", "localhost");
+int port = config.Get<int>("Server", "Port", 8080);
+string theme = config.Get("UI", "Theme", "dark", autoSave: true);  // writes the default if missing
+config.Set("Server", "Host", "192.168.0.1");
+bool exists = config.Exists("Server", "Host");
+
+if (config.TryGet("Shutdown", "Everyday", out DateTime shutdown)) { }
+```
+
+`Get<T>` returns the default value when conversion fails. `TryGet<T>` returns false
+instead, which is how you tell a malformed value apart from a genuine default: a
+value stored as `210000` read as `DateTime` yields false rather than silently
+falling back. Conversion goes through `TypeDescriptor`, so `int`, `bool`, `double`,
+`float`, `DateTime`, `TimeSpan`, enums, and any type with a registered
+`TypeConverter` all work.
+
+Section and key lookups are case-insensitive on every provider.
+
+## What `section` maps to
+
+| Provider | Section is |
+| --- | --- |
+| INI | a `[Section]` header |
+| JSON | a top-level object |
+| XML | a child element of `<Config>` |
+| Registry | a sub-key under the root path |
+
+## Provider specifics
+
+**INI.** Writing preserves the rest of the file: comments, blank lines, key order,
+and the spacing around `=` are left alone, and only the changed line is rewritten.
+A new key is inserted inside its section, above any trailing comment. INI files
+carry no encoding declaration, so a file written by the Windows
+`WritePrivateProfileString` API is in the system ANSI code page and needs an
+explicit encoding. On .NET Core and later, register the code page provider once
+with `Encoding.RegisterProvider(CodePagesEncodingProvider.Instance)` first.
+
+**JSON.** Values are written as JSON strings. A hand-edited file may use numbers,
+booleans, or `null` instead and still reads back: numbers come through as written
+without normalizing, `true` and `false` as `"True"` and `"False"`, `null` as an
+empty string. Parsing is built in rather than taken from `System.Text.Json`, so
+the package works on .NET Framework and adds no dependency. Writing escapes only
+what the JSON grammar requires, leaving non-ASCII readable as UTF-8. Malformed
+JSON raises `FormatException`.
+
+**XML.** Sections become child elements of a `<Config>` root.
+
+**Registry.** Windows only. On any other OS the constructor throws
+`PlatformNotSupportedException` rather than failing later, and on .NET 5 and later
+the call site also gets a CA1416 warning at compile time. `RegistryRoot` values are
+`CurrentUser` (default), `LocalMachine`, `ClassesRoot`, `Users`, `CurrentConfig`.
+
+## Target frameworks
+
+| Group | Targets | Dependencies |
+| --- | --- | --- |
+| .NET Framework | net461, net462, net47, net471, net472, net48, net481 | none |
+| .NET | net8.0, net10.0 | none |
+| Fallback | netstandard2.0 | `Microsoft.Win32.Registry` |
+
+All four providers ship on every target. `netstandard2.0` covers everything else -
+.NET Core 2.0 through 3.1, Mono, Xamarin, Unity - and is the only build needing a
+package, for Registry. On .NET 5 and later the SDK drops even that reference,
+because the API is part of the framework.
+
+## Version notes
+
+- 1.4.0 - targets every supported framework; Registry's Windows requirement is
+  explicit at compile time and at construction.
+- 1.3.0 - `System.Text.Json` replaced by a built-in parser, so JSON works on
+  .NET Framework. Malformed JSON now raises `FormatException` instead of
+  `JsonException`, and writing escapes less, leaving non-ASCII as UTF-8.
+- 1.2.0 - added a net461 build with no dependencies. `FromJson` was unavailable on
+  .NET Framework in this version only.
+- 1.1.0 - INI formatting is preserved on write; added an encoding option, `TryGet`,
+  and the `Config` entry point.
