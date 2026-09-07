@@ -18,10 +18,8 @@ namespace TinyConfig
         public static ITinyConfig FromFile(string filePath, Encoding encoding)
             => new Providers.IniProvider(filePath, encoding);
 
-#if !NETFRAMEWORK
-        /// <summary>Creates a JSON file provider. Not available on .NET Framework.</summary>
+        /// <summary>Creates a JSON file provider.</summary>
         public static ITinyConfig FromJson(string filePath) => new Providers.JsonProvider(filePath);
-#endif
 
         /// <summary>Creates an XML file-based configuration provider.</summary>
         public static ITinyConfig FromXml(string filePath) => new Providers.XmlProvider(filePath);

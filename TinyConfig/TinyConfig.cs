@@ -15,10 +15,8 @@ namespace TinyConfig
         /// <inheritdoc cref="Config.FromFile(string, Encoding)"/>
         public static ITinyConfig FromFile(string filePath, Encoding encoding) => Config.FromFile(filePath, encoding);
 
-#if !NETFRAMEWORK
         /// <inheritdoc cref="Config.FromJson(string)"/>
         public static ITinyConfig FromJson(string filePath) => Config.FromJson(filePath);
-#endif
 
         /// <inheritdoc cref="Config.FromXml(string)"/>
         public static ITinyConfig FromXml(string filePath) => Config.FromXml(filePath);
