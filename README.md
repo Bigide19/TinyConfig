@@ -41,6 +41,9 @@ var config = Config.FromXml("settings.xml");    // XML
 var config = Config.FromRegistry(@"SOFTWARE\MyApp"); // Registry
 ```
 
+The method picks the format - the file extension is not inspected, so
+`Config.FromFile("data.json")` reads that file as INI.
+
 ## API
 
 All providers implement `ITinyConfig`:

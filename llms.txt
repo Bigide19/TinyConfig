@@ -12,17 +12,34 @@ License: MIT
 ## Getting a provider
 
 Every backend is created from the static `Config` class and returns `ITinyConfig`,
-so the calling code is identical whichever one you pick.
+so the calling code after that point is identical whichever one you pick.
+
+**The method you call determines the format. The file extension is never
+inspected.** `Config.FromFile("data.json")` reads that file as INI, not as JSON.
+
+These are the complete factory signatures. There is no overload that takes a format
+argument, and no format auto-detection anywhere in the library.
+
+| Signature | Backend |
+| --- | --- |
+| `static ITinyConfig FromFile(string filePath)` | INI, UTF-8 without BOM |
+| `static ITinyConfig FromFile(string filePath, Encoding encoding)` | INI, explicit encoding |
+| `static ITinyConfig FromJson(string filePath)` | JSON |
+| `static ITinyConfig FromXml(string filePath)` | XML |
+| `static ITinyConfig FromRegistry(string subKey, RegistryRoot root = RegistryRoot.CurrentUser)` | Windows Registry |
+
+`FromFile` has two separate overloads; `encoding` is not an optional parameter with
+a default value.
 
 ```csharp
 using TinyConfig;
 
-ITinyConfig config = Config.FromFile("settings.ini");            // INI
-ITinyConfig config = Config.FromFile("cfg.ini", Encoding.GetEncoding(949));
-ITinyConfig config = Config.FromJson("settings.json");           // JSON
-ITinyConfig config = Config.FromXml("settings.xml");             // XML
-ITinyConfig config = Config.FromRegistry(@"SOFTWARE\MyApp");     // Registry, HKCU
-ITinyConfig config = Config.FromRegistry(@"SOFTWARE\MyApp", RegistryRoot.LocalMachine);
+ITinyConfig ini = Config.FromFile("settings.ini");
+ITinyConfig ansi = Config.FromFile("legacy.ini", Encoding.GetEncoding(949));
+ITinyConfig json = Config.FromJson("settings.json");
+ITinyConfig xml = Config.FromXml("settings.xml");
+ITinyConfig reg = Config.FromRegistry(@"SOFTWARE\MyApp");
+ITinyConfig hklm = Config.FromRegistry(@"SOFTWARE\MyApp", RegistryRoot.LocalMachine);
 ```
 
 `Config` is the current entry point. A type named `TinyConfig` also exists but is
@@ -30,6 +47,17 @@ ITinyConfig config = Config.FromRegistry(@"SOFTWARE\MyApp", RegistryRoot.LocalMa
 `using TinyConfig;`.
 
 ## Reading and writing
+
+`ITinyConfig` has five members. Three of them are generic; `Set` has no non-generic
+overload, so a value is always passed as `T`, never as `object`.
+
+| Signature |
+| --- |
+| `string Get(string section, string key, string defaultValue = "", bool autoSave = false)` |
+| `T Get<T>(string section, string key, T defaultValue = default(T), bool autoSave = false)` |
+| `bool TryGet<T>(string section, string key, out T value)` |
+| `void Set<T>(string section, string key, T value)` |
+| `bool Exists(string section, string key)` |
 
 ```csharp
 string host = config.Get("Server", "Host", "localhost");
