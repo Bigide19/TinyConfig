@@ -1,12 +1,14 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;net461</TargetFrameworks>
+    <!-- net461 은 지원 종료됐지만 4.6.1 대상 앱을 위해 유지합니다. 나머지 net4x 는
+         현재 마이크로소프트가 지원하는 버전이고, .NET 은 LTS 인 8 과 10 을 넣습니다. -->
+    <TargetFrameworks>netstandard2.0;net461;net462;net47;net471;net472;net48;net481;net8.0;net10.0</TargetFrameworks>
     <LangVersion>7.3</LangVersion>
 
     <!-- NuGet Package -->
     <PackageId>TinyConfig</PackageId>
-    <Version>1.3.0</Version>
+    <Version>1.4.0</Version>
     <Authors>Bigide19</Authors>
     <Description>The simplest way to manage INI, JSON, XML, and Registry settings for .NET. No package dependencies on .NET Framework.</Description>
     <PackageTags>config;ini;json;xml;registry;settings;configuration</PackageTags>
@@ -21,7 +23,8 @@
     <InternalsVisibleTo Include="TinyConfig.Tests" />
   </ItemGroup>
 
-  <!-- .NET Framework 는 Registry 와 Xml 이 내장입니다. JSON 은 자체 파서라 어느 타깃에서도 패키지가 필요 없습니다. -->
+  <!-- Registry API 는 .NET Framework 와 .NET 5 이상에 내장이고, netstandard2.0 에만 패키지가 필요합니다.
+       Xml 은 어디서나 내장이고 JSON 은 자체 파서라 추가 패키지가 없습니다. -->
   <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
     <PackageReference Include="Microsoft.Win32.Registry" Version="5.0.0" />
   </ItemGroup>

@@ -27,6 +27,9 @@ namespace TinyConfig
         /// <summary>Creates a Windows Registry-based configuration provider.</summary>
         /// <param name="subKey">Registry sub-key path (e.g. SOFTWARE\MyApp).</param>
         /// <param name="root">Registry root hive. Defaults to HKEY_CURRENT_USER.</param>
+#if NET5_0_OR_GREATER
+        [System.Runtime.Versioning.SupportedOSPlatform("windows")]
+#endif
         public static ITinyConfig FromRegistry(string subKey, RegistryRoot root = RegistryRoot.CurrentUser)
             => new Providers.RegistryProvider(subKey, root);
     }
