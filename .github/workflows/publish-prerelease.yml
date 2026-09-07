@@ -36,8 +36,7 @@ jobs:
         id: version
         run: echo "VERSION=$(grep -oP '(?<=<Version>).*(?=</Version>)' TinyConfig/TinyConfig.csproj)" >> $GITHUB_OUTPUT
 
-      # 프리릴리스 번호는 그 버전 안에서만 셉니다. github.run_number 는 워크플로우
-      # 실행 횟수라 버전이 올라가도 이어져서, 1.2.0-test.4 다음이 1.3.0-test.5 였습니다.
+      # Numbered per version: github.run_number counts workflow runs, so it carried over between versions.
       - name: Resolve prerelease number
         id: prerelease
         run: |

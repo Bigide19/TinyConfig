@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.Versioning;
 using NUnit.Framework;
 using TinyConfig;
 using TinyConfig.Providers;
@@ -7,6 +8,7 @@ namespace TinyConfig.Tests
 {
     [TestFixture]
     [Platform("Win")]
+    [SupportedOSPlatform("windows")]
     public class RegistryProviderTests
     {
         private const string TestSubKey = @"SOFTWARE\TinyConfigTest";

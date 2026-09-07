@@ -1,16 +1,34 @@
 using TinyConfig.Internal;
 using Microsoft.Win32;
 using System;
+#if !NETFRAMEWORK
+using System.Runtime.InteropServices;
+#endif
 
 namespace TinyConfig.Providers
 {
+    /// <summary>
+    /// Reads and writes configuration from the Windows Registry.
+    /// Sections map to sub-keys under the root path, keys to values within them.
+    /// </summary>
+#if NET5_0_OR_GREATER
+    [System.Runtime.Versioning.SupportedOSPlatform("windows")]
+#endif
     public class RegistryProvider : ITinyConfig
     {
         private readonly string _rootSubKey;
         private readonly RegistryKey _hive;
 
+        /// <summary>Creates a provider over the given sub-key.</summary>
+        /// <exception cref="PlatformNotSupportedException">Thrown when the OS is not Windows.</exception>
         public RegistryProvider(string subKey, RegistryRoot root = RegistryRoot.CurrentUser)
         {
+#if !NETFRAMEWORK
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                throw new PlatformNotSupportedException(
+                    "The Registry provider requires Windows. Use FromFile, FromJson or FromXml instead.");
+#endif
+
             _rootSubKey = subKey;
             _hive = GetHive(root);
         }

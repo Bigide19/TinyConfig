@@ -22,6 +22,9 @@ namespace TinyConfig
         public static ITinyConfig FromXml(string filePath) => Config.FromXml(filePath);
 
         /// <inheritdoc cref="Config.FromRegistry(string, RegistryRoot)"/>
+#if NET5_0_OR_GREATER
+        [System.Runtime.Versioning.SupportedOSPlatform("windows")]
+#endif
         public static ITinyConfig FromRegistry(string subKey, RegistryRoot root = RegistryRoot.CurrentUser)
             => Config.FromRegistry(subKey, root);
     }

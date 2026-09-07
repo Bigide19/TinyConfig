@@ -65,7 +65,6 @@ namespace TinyConfig.Providers
         private void Save()
         {
             EnsureDirectory();
-            // UTF-8 without BOM, matching what the previous Utf8JsonWriter emitted.
             File.WriteAllText(_filePath, MiniJson.Write(_data), new UTF8Encoding(false));
         }
 

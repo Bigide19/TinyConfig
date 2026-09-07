@@ -126,6 +126,10 @@ config.Set("Logging", "Level", "Info");
 
 ### Windows Registry
 
+Windows only. On any other OS the constructor throws `PlatformNotSupportedException`
+rather than failing later, and on .NET 8 and later the call site also gets a CA1416
+warning at compile time.
+
 ```csharp
 // Default: HKEY_CURRENT_USER
 var config = Config.FromRegistry(@"SOFTWARE\MyApp");
@@ -162,17 +166,22 @@ The first parameter (`section`) maps to different concepts depending on the prov
 
 ## Target Frameworks
 
-`netstandard2.0` and `net461`.
-
-All four providers work on both builds. The `net461` build has no NuGet
-dependencies at all: Registry and XML are part of the framework there, and JSON
-uses the built-in parser rather than `System.Text.Json`, which supports net462
-and later only.
-
-| Build | Providers | Dependencies |
+| Group | Targets | Dependencies |
 | --- | --- | --- |
-| `netstandard2.0` | INI, JSON, XML, Registry | `Microsoft.Win32.Registry` |
-| `net461` | INI, JSON, XML, Registry | none |
+| .NET Framework | `net461`, `net462`, `net47`, `net471`, `net472`, `net48`, `net481` | none |
+| .NET | `net8.0`, `net10.0` | none |
+| Fallback | `netstandard2.0` | `Microsoft.Win32.Registry` |
+
+Every target ships all four providers. Nothing is pulled in on .NET Framework or
+.NET, because Registry and XML are part of those frameworks and JSON uses the
+built-in parser instead of `System.Text.Json`, which supports net462 and later only.
+
+`netstandard2.0` covers everything else - .NET Core 2.0 through 3.1, Mono, Xamarin,
+Unity - and is the only build that needs a package, for Registry. On .NET 5 and
+later the SDK drops that reference anyway, since the API is part of the framework.
+
+`net461` is kept for apps still targeting 4.6.1 even though Microsoft ended support
+for it in April 2022.
 
 ## License
 
