@@ -1,8 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <!-- net461 은 지원 종료됐지만 4.6.1 대상 앱을 위해 유지합니다. 나머지 net4x 는
-         현재 마이크로소프트가 지원하는 버전이고, .NET 은 LTS 인 8 과 10 을 넣습니다. -->
+    <!-- net461 is past end of support but kept for apps still targeting 4.6.1. -->
     <TargetFrameworks>netstandard2.0;net461;net462;net47;net471;net472;net48;net481;net8.0;net10.0</TargetFrameworks>
     <LangVersion>7.3</LangVersion>
 
@@ -23,8 +22,7 @@
     <InternalsVisibleTo Include="TinyConfig.Tests" />
   </ItemGroup>
 
-  <!-- Registry API 는 .NET Framework 와 .NET 5 이상에 내장이고, netstandard2.0 에만 패키지가 필요합니다.
-       Xml 은 어디서나 내장이고 JSON 은 자체 파서라 추가 패키지가 없습니다. -->
+  <!-- Registry ships with .NET Framework and .NET 5+; only netstandard2.0 needs the package. -->
   <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
     <PackageReference Include="Microsoft.Win32.Registry" Version="5.0.0" />
   </ItemGroup>

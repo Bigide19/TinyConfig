@@ -7,30 +7,23 @@ namespace TinyConfig.Internal
 {
     /// <summary>
     /// Minimal JSON reader and writer for the two-level shape TinyConfig stores:
-    /// <c>{ "Section": { "Key": value } }</c>.
-    /// <para>
-    /// Replaces System.Text.Json so the library carries no package dependency and
-    /// works on .NET Framework 4.6.1, where System.Text.Json 8.x is unsupported.
-    /// Reading stays permissive because config files get hand-edited; writing emits
-    /// the narrow subset above.
-    /// </para>
+    /// <c>{ "Section": { "Key": value } }</c>. Reading accepts any JSON object;
+    /// writing emits that shape with two-space indent, LF and no BOM.
     /// </summary>
     internal static class MiniJson
     {
-        // Values are always handed back as strings. The mapping mirrors what
-        // JsonElement.ToString() used to return, so files written by 1.2.0 and
-        // earlier keep reading back identically:
-        //   "text" -> text (unescaped)   123 -> 123 (raw, not normalized)
-        //   true   -> True               null -> "" (empty)
-        // The capitalized True/False look odd for JSON, but Boolean.ToString()
-        // produces them and Set<bool> has always stored them that way.
         private const string TrueText = "True";
         private const string FalseText = "False";
 
         /// <summary>
-        /// Parses a JSON object into section/key/value form. Non-object section
-        /// values are skipped, matching the previous provider behavior.
+        /// Parses a JSON object into section/key/value form. Sections whose value is
+        /// not an object are skipped.
         /// </summary>
+        /// <remarks>
+        /// Every value comes back as a string: text unescaped, numbers as written,
+        /// <c>true</c>/<c>false</c> as "True"/"False", <c>null</c> as an empty string,
+        /// and nested objects or arrays as their raw JSON.
+        /// </remarks>
         /// <exception cref="FormatException">The text is not a JSON object.</exception>
         public static Dictionary<string, Dictionary<string, string>> Parse(string text)
         {
@@ -41,7 +34,6 @@ namespace TinyConfig.Internal
             SkipByteOrderMark(text, ref i);
             SkipWhitespace(text, ref i);
 
-            // An empty file is a valid starting point, not a parse error.
             if (i >= text.Length) return result;
 
             Expect(text, ref i, '{');
@@ -64,7 +56,6 @@ namespace TinyConfig.Internal
                 }
                 else
                 {
-                    // Top-level scalars and arrays carry no section, so drop them.
                     SkipValue(text, ref i);
                 }
 
@@ -79,9 +70,8 @@ namespace TinyConfig.Internal
         }
 
         /// <summary>
-        /// Writes section/key/value form as indented JSON: two spaces, LF, no BOM.
-        /// Escaping is kept to what the JSON grammar requires, so non-ASCII text
-        /// stays readable as UTF-8.
+        /// Writes section/key/value form as indented JSON. Only characters the JSON
+        /// grammar requires are escaped, so non-ASCII text stays readable as UTF-8.
         /// </summary>
         public static string Write(Dictionary<string, Dictionary<string, string>> data)
         {
@@ -172,8 +162,6 @@ namespace TinyConfig.Internal
 
             if (c == '{' || c == '[')
             {
-                // Nested containers are outside the two-level model. Hand back the
-                // raw slice rather than re-serializing it.
                 int start = i;
                 SkipValue(text, ref i);
                 return text.Substring(start, i - start);
@@ -233,8 +221,6 @@ namespace TinyConfig.Internal
                     case 'r': sb.Append('\r'); break;
                     case 't': sb.Append('\t'); break;
                     case 'u':
-                        // Surrogate pairs arrive as two \u escapes; appending each code
-                        // unit in order rebuilds the character, since .NET strings are UTF-16.
                         sb.Append(ReadHexCodeUnit(text, ref i));
                         break;
                     default:
@@ -338,8 +324,6 @@ namespace TinyConfig.Internal
                         case '\r': sb.Append("\\r"); break;
                         case '\t': sb.Append("\\t"); break;
                         default:
-                            // The grammar only forbids raw control characters. Everything
-                            // else, non-ASCII included, is written through as UTF-8.
                             if (c < ' ')
                                 sb.Append("\\u").Append(((int)c).ToString("x4", CultureInfo.InvariantCulture));
                             else

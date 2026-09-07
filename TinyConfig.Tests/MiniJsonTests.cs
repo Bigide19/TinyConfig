@@ -8,11 +8,7 @@ using TinyConfig.Internal;
 
 namespace TinyConfig.Tests
 {
-    /// <summary>
-    /// Covers the hand-written JSON reader and writer that replaced System.Text.Json.
-    /// The existing JsonProviderTests store every value as a string, so the escape,
-    /// number and boolean paths only get exercised here.
-    /// </summary>
+    /// <summary>Covers MiniJson's escape, number and boolean handling.</summary>
     [TestFixture]
     public class MiniJsonTests
     {
@@ -31,10 +27,6 @@ namespace TinyConfig.Tests
                 File.Delete(_tempFile);
         }
 
-        // ---------------------------------------------------------------
-        // Reading: value kinds other than string
-        // ---------------------------------------------------------------
-
         [Test]
         public void Reads_number_as_written_without_normalizing()
         {
@@ -49,8 +41,6 @@ namespace TinyConfig.Tests
         [Test]
         public void Reads_boolean_capitalized_like_Boolean_ToString()
         {
-            // Set<bool> stores Boolean.ToString(), so a hand-edited `true` has to read
-            // back the same way or Get(section, key) would disagree with Get<bool>.
             var data = MiniJson.Parse("{\"S\":{\"t\":true,\"f\":false}}");
 
             Assert.That(data["S"]["t"], Is.EqualTo("True"));
@@ -84,15 +74,9 @@ namespace TinyConfig.Tests
             Assert.That(data["S"]["k"], Is.EqualTo("v"));
         }
 
-        // ---------------------------------------------------------------
-        // Reading: escape sequences
-        // ---------------------------------------------------------------
-
         [Test]
         public void Reads_unicode_escape_written_by_earlier_versions()
         {
-            // 1.2.0 and earlier wrote non-ASCII through Utf8JsonWriter, which escapes
-            // every code unit. Those files have to keep reading back correctly.
             var data = MiniJson.Parse("{\"General\":{\"Lang\":\"\\uD55C\\uAE00\"}}");
 
             Assert.That(data["General"]["Lang"], Is.EqualTo("한글"));
@@ -101,7 +85,6 @@ namespace TinyConfig.Tests
         [Test]
         public void Reads_surrogate_pair_escape()
         {
-            // U+1F600 arrives as two \u escapes; appending both code units rebuilds it.
             var data = MiniJson.Parse("{\"S\":{\"emoji\":\"\\uD83D\\uDE00\"}}");
 
             Assert.That(data["S"]["emoji"], Is.EqualTo("\U0001F600"));
@@ -122,10 +105,6 @@ namespace TinyConfig.Tests
 
             Assert.That(data["S"]["a\"b"], Is.EqualTo("v"));
         }
-
-        // ---------------------------------------------------------------
-        // Reading: shape and whitespace tolerance
-        // ---------------------------------------------------------------
 
         [Test]
         public void Reads_empty_text_as_no_sections()
@@ -174,15 +153,9 @@ namespace TinyConfig.Tests
             Assert.That(data["GENERAL"]["language"], Is.EqualTo("ko"));
         }
 
-        // ---------------------------------------------------------------
-        // Reading: malformed input
-        // ---------------------------------------------------------------
-
         [Test]
         public void Throws_FormatException_on_malformed_json()
         {
-            // System.Text.Json raised JsonException here; the hand-written parser
-            // raises FormatException, which is noted in the 1.3.0 release notes.
             Assert.Throws<FormatException>(() => MiniJson.Parse("{\"S\":{\"k\":\"v\""));
             Assert.Throws<FormatException>(() => MiniJson.Parse("[1,2]"));
             Assert.Throws<FormatException>(() => MiniJson.Parse("{\"S\":{\"k\" \"v\"}}"));
@@ -190,10 +163,6 @@ namespace TinyConfig.Tests
             Assert.Throws<FormatException>(() => MiniJson.Parse("{\"S\":{\"k\":\"\\q\"}}"));
             Assert.Throws<FormatException>(() => MiniJson.Parse("{\"S\":{\"k\":\"\\u12\"}}"));
         }
-
-        // ---------------------------------------------------------------
-        // Writing
-        // ---------------------------------------------------------------
 
         [Test]
         public void Writes_two_space_indent_with_lf_newlines()
@@ -206,8 +175,6 @@ namespace TinyConfig.Tests
         [Test]
         public void Writes_non_ascii_as_is()
         {
-            // The chosen policy: escape only what the grammar requires, so a config
-            // file stays readable. Earlier versions emitted \uD55C\uAE00 here.
             var json = MiniJson.Write(Data("General", "Lang", "한글"));
 
             Assert.That(json, Does.Contain("\"한글\""));
@@ -269,10 +236,6 @@ namespace TinyConfig.Tests
                 "{\n  \"A\": {\n    \"k1\": \"v1\",\n    \"k2\": \"v2\"\n  },\n  \"B\": {\n    \"k\": \"v\"\n  }\n}"));
         }
 
-        // ---------------------------------------------------------------
-        // Round trip and provider-level compatibility
-        // ---------------------------------------------------------------
-
         [Test]
         public void Round_trips_awkward_values()
         {
@@ -294,7 +257,6 @@ namespace TinyConfig.Tests
         [Test]
         public void Provider_reads_file_written_by_earlier_versions()
         {
-            // Byte-for-byte what 1.2.0 produced for these values.
             string legacy = "{\n  \"General\": {\n    \"Lang\": \"\\uD55C\\uAE00\",\n"
                 + "    \"Amp\": \"a\\u0026b\\u003Cc\\u003E\",\n    \"Quote\": \"a\\u0022b\"\n  }\n}";
             File.WriteAllText(_tempFile, legacy, new UTF8Encoding(false));
@@ -340,7 +302,6 @@ namespace TinyConfig.Tests
             Assert.That(reloaded.Get("S", "Text"), Is.EqualTo("값 \"인용\"\t탭"));
         }
 
-        /// <summary>Builds a single-section, single-key structure.</summary>
         private static Dictionary<string, Dictionary<string, string>> Data(string section, string key, string value)
         {
             var data = new Dictionary<string, Dictionary<string, string>>();

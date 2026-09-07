@@ -7,8 +7,8 @@ using TinyConfig.Providers;
 namespace TinyConfig.Tests
 {
     [TestFixture]
-    [Platform("Win")]           // NUnit: 다른 OS 에서는 실행하지 않습니다
-    [SupportedOSPlatform("windows")]  // 컴파일러: 같은 제약을 분석기에 알립니다
+    [Platform("Win")]
+    [SupportedOSPlatform("windows")]
     public class RegistryProviderTests
     {
         private const string TestSubKey = @"SOFTWARE\TinyConfigTest";
