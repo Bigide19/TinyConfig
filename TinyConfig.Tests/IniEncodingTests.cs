@@ -13,7 +13,7 @@ namespace TinyConfig.Tests
     [TestFixture]
     public class IniEncodingTests
     {
-        private const string Original = "; 키오스크 설정\n[Printer]\nName=삼성 SL-M2020\nPort=USB001";
+        private const string Original = "; 사용자 설정\n[User]\nName=홍길동\nTheme=Light";
 
         private string _tempFile;
         private CultureInfo _culture;
@@ -52,10 +52,10 @@ namespace TinyConfig.Tests
             File.WriteAllBytes(_tempFile, FileBytes(utf8, Original));
 
             var config = Config.FromFile(_tempFile);
-            config.Set("Printer", "Name", "엡손 TM-T82");
+            config.Set("User", "Name", "김철수");
 
             Assert.That(File.ReadAllBytes(_tempFile),
-                Is.EqualTo(FileBytes(utf8, Original.Replace("삼성 SL-M2020", "엡손 TM-T82"))));
+                Is.EqualTo(FileBytes(utf8, Original.Replace("홍길동", "김철수"))));
         }
 
         [Test]
@@ -65,11 +65,11 @@ namespace TinyConfig.Tests
             File.WriteAllBytes(_tempFile, FileBytes(utf8Bom, Original));
 
             var config = Config.FromFile(_tempFile);
-            config.Set("Printer", "Port", "USB002");
+            config.Set("User", "Theme", "Dark");
 
-            Assert.That(config.Get("Printer", "Name"), Is.EqualTo("삼성 SL-M2020"));
+            Assert.That(config.Get("User", "Name"), Is.EqualTo("홍길동"));
             Assert.That(File.ReadAllBytes(_tempFile),
-                Is.EqualTo(FileBytes(utf8Bom, Original.Replace("USB001", "USB002"))));
+                Is.EqualTo(FileBytes(utf8Bom, Original.Replace("Light", "Dark"))));
         }
 
         [Test]
@@ -79,10 +79,10 @@ namespace TinyConfig.Tests
             File.WriteAllBytes(_tempFile, FileBytes(utf16, Original));
 
             var config = Config.FromFile(_tempFile);
-            config.Set("Printer", "Name", "엡손 TM-T82");
+            config.Set("User", "Name", "김철수");
 
             Assert.That(File.ReadAllBytes(_tempFile),
-                Is.EqualTo(FileBytes(utf16, Original.Replace("삼성 SL-M2020", "엡손 TM-T82"))));
+                Is.EqualTo(FileBytes(utf16, Original.Replace("홍길동", "김철수"))));
         }
 
         [Test]
@@ -94,7 +94,7 @@ namespace TinyConfig.Tests
 
             var config = Config.FromFile(_tempFile);
 
-            Assert.That(config.Get("Printer", "Name"), Is.EqualTo("삼성 SL-M2020"));
+            Assert.That(config.Get("User", "Name"), Is.EqualTo("홍길동"));
         }
 
         [Test]
@@ -105,10 +105,10 @@ namespace TinyConfig.Tests
             File.WriteAllBytes(_tempFile, FileBytes(Cp949(), Original));
 
             var config = Config.FromFile(_tempFile);
-            config.Set("Printer", "Name", "엡손 TM-T82");
+            config.Set("User", "Name", "김철수");
 
             Assert.That(File.ReadAllBytes(_tempFile),
-                Is.EqualTo(FileBytes(Cp949(), Original.Replace("삼성 SL-M2020", "엡손 TM-T82"))));
+                Is.EqualTo(FileBytes(Cp949(), Original.Replace("홍길동", "김철수"))));
         }
 
         [Test]
@@ -118,20 +118,20 @@ namespace TinyConfig.Tests
             File.WriteAllBytes(_tempFile, FileBytes(Cp949(), Original));
 
             var config = Config.FromFile(_tempFile);
-            config.Set("Printer", "Port", "USB002");
+            config.Set("User", "Theme", "Dark");
 
             Assert.That(File.ReadAllBytes(_tempFile),
-                Is.EqualTo(FileBytes(Cp949(), Original.Replace("USB001", "USB002"))));
+                Is.EqualTo(FileBytes(Cp949(), Original.Replace("Light", "Dark"))));
         }
 
         [Test]
         public void New_file_is_created_as_utf8_without_bom()
         {
             var config = Config.FromFile(_tempFile);
-            config.Set("Printer", "Name", "삼성");
+            config.Set("User", "Name", "홍길동");
 
             Assert.That(File.ReadAllBytes(_tempFile),
-                Is.EqualTo(FileBytes(new UTF8Encoding(false), "[Printer]\nName=삼성")));
+                Is.EqualTo(FileBytes(new UTF8Encoding(false), "[User]\nName=홍길동")));
         }
 
         [Test]
@@ -142,7 +142,7 @@ namespace TinyConfig.Tests
 
             var config = Config.FromFile(_tempFile, new UTF8Encoding(false));
 
-            Assert.That(config.Get("Printer", "Name"), Does.Contain("�"));
+            Assert.That(config.Get("User", "Name"), Does.Contain("�"));
         }
 
         [TestCase(new byte[] { 0xEF, 0xBB, 0xBF, 0x41 }, 65001)]
@@ -163,7 +163,7 @@ namespace TinyConfig.Tests
         public void Content_no_code_page_decodes_falls_back_to_latin1()
         {
             CultureInfo.CurrentCulture = new CultureInfo("ko-KR");
-            byte[] bytes = Cp949().GetBytes("Name=삼성").Concat(new byte[] { 0xB0 }).ToArray();
+            byte[] bytes = Cp949().GetBytes("Name=홍길동").Concat(new byte[] { 0xB0 }).ToArray();
 
             Encoding detected = EncodingDetector.Detect(bytes);
 
