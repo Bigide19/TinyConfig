@@ -132,7 +132,9 @@ because the API is part of the framework.
 
 - 1.5.0 - `FromFile(path)` detects the INI encoding (BOM, UTF-8, system ANSI code
   page) and writes back in it, so files from `WritePrivateProfileString` keep
-  their code page.
+  their code page. A non-UTF-8 file that 1.4.1 read as UTF-8, turning non-ASCII
+  into U+FFFD, now reads in the detected code page. `FromFile(path, null)` also
+  detects instead of using UTF-8.
 - 1.4.0 - targets every supported framework; Registry's Windows requirement is
   explicit at compile time and at construction.
 - 1.3.0 - `System.Text.Json` replaced by a built-in parser, so JSON works on

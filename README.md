@@ -91,8 +91,8 @@ spacing around `=` stay as they were, and only the line being changed is rewritt
 A new key is added inside its section, above any trailing comment.
 
 INI files carry no encoding declaration, so `FromFile(path)` detects it from the
-file and writes back in the same encoding. A file keeps its format no matter which
-program created it.
+file and writes back in the same encoding. A file written by another program, such
+as one using the Win32 INI API, keeps its format.
 
 | File | Read and written as |
 | --- | --- |
@@ -106,10 +106,17 @@ is used instead. A file that none of these decode cleanly is read as Latin-1:
 non-ASCII values look garbled, but lines you did not set are written back with the
 same bytes. Line endings follow the platform, as before.
 
-Detection has two limits. A very short ANSI file can happen to be valid UTF-8, and
-a file written on a machine with a different locale decodes as this machine's code
-page. Characters the file's encoding cannot represent, such as emoji in a code page
-file, are written as `?`. When you know the encoding, pass it:
+Detection has limits:
+
+- A very short ANSI file can happen to be valid UTF-8.
+- A file written on a machine with a different locale decodes as this machine's
+  code page.
+- A file that mixes encodings, such as UTF-8 lines followed by lines another
+  program wrote in ANSI, decodes as a single encoding, so some lines look garbled.
+
+Characters the file's encoding cannot represent are written as the closest
+character or `?`, the same as the Win32 INI API does: `é` becomes `e` and emoji
+become `?` in code page 949. When you know the encoding, pass it:
 
 ```csharp
 // .NET Core and later need the code page provider registered once
