@@ -40,8 +40,9 @@ namespace TinyConfig.Providers
         public IniProvider(string filePath, Encoding encoding)
         {
             _filePath = filePath;
-            _encoding = encoding ?? EncodingDetector.Detect(filePath);
-            Load();
+            byte[] content = File.Exists(filePath) ? File.ReadAllBytes(filePath) : null;
+            _encoding = encoding ?? EncodingDetector.Detect(content);
+            Load(content);
         }
 
         /// <inheritdoc/>
@@ -108,12 +109,23 @@ namespace TinyConfig.Providers
 
         #region Load / Save
 
-        private void Load()
+        /// <summary>
+        /// Splits the file content into lines the same way File.ReadAllLines does,
+        /// from bytes already read once so detection and parsing see the same content.
+        /// </summary>
+        private void Load(byte[] content)
         {
             _lines.Clear();
 
-            if (File.Exists(_filePath))
-                _lines.AddRange(File.ReadAllLines(_filePath, _encoding));
+            if (content != null)
+            {
+                using (var reader = new StreamReader(new MemoryStream(content), _encoding, true))
+                {
+                    string line;
+                    while ((line = reader.ReadLine()) != null)
+                        _lines.Add(line);
+                }
+            }
 
             Reindex();
         }

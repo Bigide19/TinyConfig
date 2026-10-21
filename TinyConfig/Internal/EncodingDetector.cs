@@ -1,6 +1,5 @@
 using System;
 using System.Globalization;
-using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
 
@@ -18,16 +17,11 @@ namespace TinyConfig.Internal
         private const int Utf8CodePage = 65001;
         private const int Latin1CodePage = 28591;
 
-        /// <summary>Detects the encoding of the file at the given path. A missing or empty file is UTF-8 without BOM.</summary>
-        public static Encoding Detect(string filePath)
-        {
-            if (!File.Exists(filePath)) return new UTF8Encoding(false);
-            return Detect(File.ReadAllBytes(filePath));
-        }
-
-        /// <summary>Detects the encoding of the given file content.</summary>
+        /// <summary>Detects the encoding of the given file content. Null or empty content is UTF-8 without BOM.</summary>
         public static Encoding Detect(byte[] bytes)
         {
+            if (bytes == null || bytes.Length == 0) return new UTF8Encoding(false);
+
             Encoding bom = FromByteOrderMark(bytes);
             if (bom != null) return bom;
 
@@ -39,7 +33,7 @@ namespace TinyConfig.Internal
             Encoding culture = FromCodePage(CultureInfo.CurrentCulture.TextInfo.ANSICodePage);
             if (culture != null && CanDecode(culture, bytes)) return culture;
 
-            return Encoding.GetEncoding(Latin1CodePage);
+            return FromCodePage(Latin1CodePage) ?? new UTF8Encoding(false);
         }
 
         /// <summary>Returns the encoding named by a leading byte order mark, or null when there is none.</summary>
@@ -109,14 +103,28 @@ namespace TinyConfig.Internal
         }
 
         /// <summary>
-        /// Returns the system ANSI code page that the Win32 INI API uses, or 0 off Windows.
+        /// Returns the system ANSI code page that the Win32 INI API uses, or 0 off Windows
+        /// and on Windows editions that do not export GetACP.
         /// </summary>
         private static int SystemAnsiCodePage()
         {
 #if NETFRAMEWORK
             return Encoding.Default.CodePage;
 #else
-            return RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? GetACP() : 0;
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) return 0;
+
+            try
+            {
+                return GetACP();
+            }
+            catch (DllNotFoundException)
+            {
+                return 0;
+            }
+            catch (EntryPointNotFoundException)
+            {
+                return 0;
+            }
 #endif
         }
 
