@@ -112,7 +112,7 @@ namespace TinyConfig.Tests
         }
 
         [Test]
-        public void Unset_lines_keep_their_bytes_when_the_code_page_is_unknown()
+        public void Unset_lines_keep_their_bytes_under_a_single_byte_code_page()
         {
             CultureInfo.CurrentCulture = CultureInfo.InvariantCulture;
             File.WriteAllBytes(_tempFile, FileBytes(Cp949(), Original));
@@ -156,6 +156,18 @@ namespace TinyConfig.Tests
 
             Assert.That(detected.CodePage, Is.EqualTo(codePage));
             Assert.That(detected.GetPreamble(), Is.Not.Empty);
+        }
+
+        [Test]
+        [Platform(Exclude = "Win", Reason = "Windows uses the system code page before the culture's")]
+        public void Content_no_code_page_decodes_falls_back_to_latin1()
+        {
+            CultureInfo.CurrentCulture = new CultureInfo("ko-KR");
+            byte[] bytes = Cp949().GetBytes("Name=삼성").Concat(new byte[] { 0xB0 }).ToArray();
+
+            Encoding detected = EncodingDetector.Detect(bytes);
+
+            Assert.That(detected.CodePage, Is.EqualTo(28591));
         }
 
         [Test]

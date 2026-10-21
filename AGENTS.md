@@ -63,7 +63,7 @@ the library, not for someone reading the implementation.
 
 ```bash
 dotnet build                 # 10 target frameworks, must stay at 0 warnings
-dotnet test                  # 104 tests
+dotnet test                  # 105 tests
 dotnet pack -c Release       # produces .nupkg and .snupkg
 ```
 
