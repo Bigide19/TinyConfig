@@ -18,11 +18,11 @@ so the calling code after that point is identical whichever one you pick.
 inspected.** `Config.FromFile("data.json")` reads that file as INI, not as JSON.
 
 These are the complete factory signatures. There is no overload that takes a format
-argument, and no format auto-detection anywhere in the library.
+argument, and no file format auto-detection anywhere in the library.
 
 | Signature | Backend |
 | --- | --- |
-| `static ITinyConfig FromFile(string filePath)` | INI, UTF-8 without BOM |
+| `static ITinyConfig FromFile(string filePath)` | INI, encoding detected from the file |
 | `static ITinyConfig FromFile(string filePath, Encoding encoding)` | INI, explicit encoding |
 | `static ITinyConfig FromJson(string filePath)` | JSON |
 | `static ITinyConfig FromXml(string filePath)` | XML |
@@ -92,10 +92,13 @@ Section and key lookups are case-insensitive on every provider.
 **INI.** Writing preserves the rest of the file: comments, blank lines, key order,
 and the spacing around `=` are left alone, and only the changed line is rewritten.
 A new key is inserted inside its section, above any trailing comment. INI files
-carry no encoding declaration, so a file written by the Windows
-`WritePrivateProfileString` API is in the system ANSI code page and needs an
-explicit encoding. On .NET Core and later, register the code page provider once
-with `Encoding.RegisterProvider(CodePagesEncodingProvider.Instance)` first.
+carry no encoding declaration, so `FromFile(path)` detects it: a byte order mark
+wins, then strict UTF-8, then the system ANSI code page (the current culture's off
+Windows), then Latin-1. Writes use the detected encoding, so a file written by
+`WritePrivateProfileString` stays in its code page and unchanged lines keep their
+bytes, apart from line endings, which follow the platform. A new file is UTF-8 without BOM. Pass an explicit encoding when it is known;
+on .NET Core and later, register the code page provider once with
+`Encoding.RegisterProvider(CodePagesEncodingProvider.Instance)` first.
 
 **JSON.** Values are written as JSON strings. A hand-edited file may use numbers,
 booleans, or `null` instead and still reads back: numbers come through as written
@@ -127,6 +130,9 @@ because the API is part of the framework.
 
 ## Version notes
 
+- 1.5.0 - `FromFile(path)` detects the INI encoding (BOM, UTF-8, system ANSI code
+  page) and writes back in it, so files from `WritePrivateProfileString` keep
+  their code page.
 - 1.4.0 - targets every supported framework; Registry's Windows requirement is
   explicit at compile time and at construction.
 - 1.3.0 - `System.Text.Json` replaced by a built-in parser, so JSON works on

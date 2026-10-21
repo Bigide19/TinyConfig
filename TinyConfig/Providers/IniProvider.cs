@@ -24,18 +24,23 @@ namespace TinyConfig.Providers
         private Dictionary<string, Dictionary<string, int>> _index =
             new Dictionary<string, Dictionary<string, int>>(StringComparer.OrdinalIgnoreCase);
 
-        /// <summary>Creates a provider over the given INI file, read as UTF-8 without BOM.</summary>
+        /// <summary>
+        /// Creates a provider over the given INI file, detecting its encoding.
+        /// A byte order mark wins, then UTF-8, then the system ANSI code page.
+        /// Writes use the detected encoding, so the file keeps its format.
+        /// A new file is created as UTF-8 without BOM.
+        /// </summary>
         public IniProvider(string filePath) : this(filePath, null)
         {
         }
 
         /// <summary>Creates a provider over the given INI file with an explicit encoding.</summary>
         /// <param name="filePath">Path to the INI file. It does not need to exist yet.</param>
-        /// <param name="encoding">Encoding for reading and writing. Defaults to UTF-8 without BOM.</param>
+        /// <param name="encoding">Encoding for reading and writing. When null, it is detected from the file.</param>
         public IniProvider(string filePath, Encoding encoding)
         {
             _filePath = filePath;
-            _encoding = encoding ?? new UTF8Encoding(false);
+            _encoding = encoding ?? EncodingDetector.Detect(filePath);
             Load();
         }
 

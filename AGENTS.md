@@ -23,6 +23,7 @@ TinyConfig/                 Library
   Internal/
     ValueConverter.cs       String to T via TypeDescriptor
     MiniJson.cs             Hand-written JSON reader/writer
+    EncodingDetector.cs     INI encoding detection when none is given
   Providers/                One file per backend
 TinyConfig.Tests/           NUnit, net10.0 only
 TinyConfig.Sample.Wpf/      WPF sample, net10.0-windows

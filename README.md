@@ -90,9 +90,26 @@ Writing leaves the rest of the file alone. Comments, blank lines, key order and 
 spacing around `=` stay as they were, and only the line being changed is rewritten.
 A new key is added inside its section, above any trailing comment.
 
-INI files carry no encoding declaration. A file written by the Windows
-`WritePrivateProfileString` API is in the system ANSI code page, so pass the
-encoding explicitly instead of relying on the UTF-8 default:
+INI files carry no encoding declaration, so `FromFile(path)` detects it from the
+file and writes back in the same encoding. A file keeps its format no matter which
+program created it.
+
+| File | Read and written as |
+| --- | --- |
+| Starts with a byte order mark | UTF-8, UTF-16 or UTF-32, BOM kept |
+| Valid UTF-8, including ASCII only | UTF-8 without BOM |
+| Anything else, such as a file from `WritePrivateProfileString` | System ANSI code page (949 on Korean Windows, 932 on Japanese, 1252 on Western European) |
+| A new file | UTF-8 without BOM |
+
+Off Windows there is no system code page, so the current culture's ANSI code page
+is used instead. A file that none of these decode cleanly is read as Latin-1:
+non-ASCII values look garbled, but lines you did not set are written back with the
+same bytes. Line endings follow the platform, as before.
+
+Detection has two limits. A very short ANSI file can happen to be valid UTF-8, and
+a file written on a machine with a different locale decodes as this machine's code
+page. Characters the file's encoding cannot represent, such as emoji in a code page
+file, are written as `?`. When you know the encoding, pass it:
 
 ```csharp
 // .NET Core and later need the code page provider registered once
@@ -100,6 +117,10 @@ Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
 var config = Config.FromFile("cfg.ini", Encoding.GetEncoding(949));
 ```
+
+On .NET Framework, .NET 8 and .NET 10 detection works without that registration.
+The `netstandard2.0` build, used on runtimes such as .NET Core 3.1, needs it before
+a code page file is detected.
 
 ### JSON
 
