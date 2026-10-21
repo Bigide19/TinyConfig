@@ -24,19 +24,25 @@ namespace TinyConfig.Providers
         private Dictionary<string, Dictionary<string, int>> _index =
             new Dictionary<string, Dictionary<string, int>>(StringComparer.OrdinalIgnoreCase);
 
-        /// <summary>Creates a provider over the given INI file, read as UTF-8 without BOM.</summary>
+        /// <summary>
+        /// Creates a provider over the given INI file, detecting its encoding.
+        /// A byte order mark wins, then UTF-8, then the system ANSI code page.
+        /// Writes use the detected encoding, so the file keeps its format.
+        /// A new file is created as UTF-8 without BOM.
+        /// </summary>
         public IniProvider(string filePath) : this(filePath, null)
         {
         }
 
         /// <summary>Creates a provider over the given INI file with an explicit encoding.</summary>
         /// <param name="filePath">Path to the INI file. It does not need to exist yet.</param>
-        /// <param name="encoding">Encoding for reading and writing. Defaults to UTF-8 without BOM.</param>
+        /// <param name="encoding">Encoding for reading and writing. When null, it is detected from the file.</param>
         public IniProvider(string filePath, Encoding encoding)
         {
             _filePath = filePath;
-            _encoding = encoding ?? new UTF8Encoding(false);
-            Load();
+            byte[] content = File.Exists(filePath) ? File.ReadAllBytes(filePath) : null;
+            _encoding = encoding ?? EncodingDetector.Detect(content);
+            Load(content);
         }
 
         /// <inheritdoc/>
@@ -103,12 +109,23 @@ namespace TinyConfig.Providers
 
         #region Load / Save
 
-        private void Load()
+        /// <summary>
+        /// Splits the file content into lines the same way File.ReadAllLines does,
+        /// from bytes already read once so detection and parsing see the same content.
+        /// </summary>
+        private void Load(byte[] content)
         {
             _lines.Clear();
 
-            if (File.Exists(_filePath))
-                _lines.AddRange(File.ReadAllLines(_filePath, _encoding));
+            if (content != null)
+            {
+                using (var reader = new StreamReader(new MemoryStream(content), _encoding, true))
+                {
+                    string line;
+                    while ((line = reader.ReadLine()) != null)
+                        _lines.Add(line);
+                }
+            }
 
             Reindex();
         }

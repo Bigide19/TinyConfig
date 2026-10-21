@@ -23,6 +23,7 @@ TinyConfig/                 Library
   Internal/
     ValueConverter.cs       String to T via TypeDescriptor
     MiniJson.cs             Hand-written JSON reader/writer
+    EncodingDetector.cs     INI encoding detection when none is given
   Providers/                One file per backend
 TinyConfig.Tests/           NUnit, net10.0 only
 TinyConfig.Sample.Wpf/      WPF sample, net10.0-windows
@@ -62,7 +63,7 @@ the library, not for someone reading the implementation.
 
 ```bash
 dotnet build                 # 10 target frameworks, must stay at 0 warnings
-dotnet test                  # 90 tests
+dotnet test                  # 105 tests
 dotnet pack -c Release       # produces .nupkg and .snupkg
 ```
 

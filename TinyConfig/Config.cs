@@ -7,12 +7,20 @@ namespace TinyConfig
     /// </summary>
     public static class Config
     {
-        /// <summary>Creates an INI file provider using UTF-8 without BOM.</summary>
+        /// <summary>
+        /// Creates an INI file provider that detects the file's encoding.
+        /// A byte order mark wins, then UTF-8, then the system ANSI code page such as 949,
+        /// so files written by the Win32 INI API read correctly. Writes keep that encoding.
+        /// A new file is created as UTF-8 without BOM. Pass an explicit encoding when it is known.
+        /// The netstandard2.0 build, used on runtimes such as .NET Core 3.1, detects code pages
+        /// only after Encoding.RegisterProvider(CodePagesEncodingProvider.Instance).
+        /// </summary>
         public static ITinyConfig FromFile(string filePath) => new Providers.IniProvider(filePath);
 
         /// <summary>Creates an INI file provider with an explicit encoding.</summary>
         /// <param name="filePath">Path to the INI file. It does not need to exist yet.</param>
         /// <param name="encoding">
+        /// Encoding for reading and writing. When null, it is detected as in FromFile(string).
         /// On .NET Core and later, code pages such as 949 require
         /// Encoding.RegisterProvider(CodePagesEncodingProvider.Instance).
         /// </param>
